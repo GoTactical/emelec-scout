@@ -1287,56 +1287,47 @@ function showTop5Panel(slot,li){
 // FUNCIÓN PARA CARGAR DATOS DESDE SUPABASE
 // ============================================================================
 async function cargarDesdeSupabase() {
+  const PAGE_SIZE = 1000;
+  let offset = 0;
+  let totalCargados = 0;
+  const sbci = document.getElementById('sb-ci');
+  if(sbci) sbci.textContent = 'Cargando datos...';
   try {
     console.log('🔄 Conectando a Supabase...');
-    
-    const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/jugadores?select=*`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
+    while(true) {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/jugadores?select=*&offset=${offset}&limit=${PAGE_SIZE}`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Range-Unit': 'items', 'Prefer': 'count=exact' } }
+      );
+      if(!response.ok) { const e = await response.text(); throw new Error(`HTTP ${response.status}: ${e}`); }
+      const jugadores = await response.json();
+      if(!jugadores.length) break;
+      for(const j of jugadores) {
+        const datos = (typeof j.datos_completos === 'string') ? JSON.parse(j.datos_completos) : (j.datos_completos || {});
+        ALL.push({
+          'Jugador': j.nombre_jugador || '—', 'Equipo': j.equipo || '—',
+          'Posición específica': j.posicion || '—', 'Edad': j.edad ?? null,
+          'Partidos jugados': j.partidos ?? 0, 'Minutos jugados': j.minutos ?? 0,
+          'Goles': j.goles ?? 0, 'Asistencias': j.asistencias ?? 0,
+          'xG': j.xg ?? null, 'xA': j.xa ?? null,
+          'Valor de mercado (Transfermarkt)': j.valor_mercado ?? null,
+          ...datos
+        });
       }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      totalCargados += jugadores.length;
+      console.log(`📦 ${totalCargados} jugadores cargados...`);
+      if(jugadores.length < PAGE_SIZE) break;
+      offset += PAGE_SIZE;
     }
-
-    const jugadores = await response.json();
-    console.log(`✅ Cargados ${jugadores.length} jugadores desde Supabase`);
-    
-    // Mapear datos de Supabase a formato esperado por la app
-    for(const j of jugadores) {
-      const datos = JSON.parse(j.datos_completos || '{}');
-      ALL.push({
-        'Jugador': j.nombre_jugador,
-        'Equipo': j.equipo,
-        'Posición específica': j.posicion,
-        'Edad': j.edad,
-        'Partidos jugados': j.partidos,
-        'Minutos jugados': j.minutos,
-        'Goles': j.goles,
-        'Asistencias': j.asistencias,
-        'xG': j.xg,
-        'xA': j.xa,
-        'Valor de mercado (Transfermarkt)': j.valor_mercado,
-        ...datos
-      });
-    }
-    
-    // Ejecutar funciones de la app
-    buildCG();
-    updR();
-    
+    console.log(`✅ Total: ${totalCargados} jugadores`);
+    if(sbci) sbci.textContent = 'LigaPro Ecuador';
+    buildCG(); updR();
   } catch(error) {
-    console.error('❌ Error conectando a Supabase:', error);
-    alert('Error conectando a Supabase: ' + error.message);
+    console.error('❌ Error Supabase:', error);
+    if(sbci) sbci.textContent = 'Error de conexión';
+    notify('Error Supabase: ' + error.message);
   }
 }
-
-// Cargar datos cuando carga la página
 window.addEventListener('load', cargarDesdeSupabase);
 
 
@@ -1396,41 +1387,6 @@ function exportReportPDF(){
   });
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-// Función para navegar entre secciones
-function nav(page, el) {
-  // Ocultar todas las páginas
-  const pages = document.querySelectorAll('.pg');
-  pages.forEach(p => p.classList.remove('active'));
-  
-  // Mostrar la página seleccionada
-  const page_el = document.getElementById('page-' + page);
-  if(page_el) {
-    page_el.classList.add('active');
-  }
-  
-  // Actualizar botones de navegación
-  const nis = document.querySelectorAll('.ni');
-  nis.forEach(n => n.classList.remove('active'));
-  if(el) {
-    el.classList.add('active');
-  }
-  
-  // Cambiar título
-  const titles = {
-    'dashboard': 'Dashboard',
-    'report': 'Informe',
-    'compare': 'Comparador',
-    'ranking': 'Ranking',
-    'rankings': 'Similitud'
-  };
-  const tt = document.getElementById('tt');
-  if(tt) {
-    tt.textContent = titles[page] || page;
-  }
-}
-
-
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 </html>
