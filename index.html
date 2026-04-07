@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -951,7 +950,7 @@ function injectAIContent(rawHtml, titles, count){
     if(el){el.innerHTML=secDivs[i]||'<em style="color:var(--mu);">Sección no disponible en esta respuesta.</em>';}
   }
 }
-function genRep(){if(!repP)return;const p=repP,sc=calc(p),col=scC(sc.score);const isGK=p['Grupo táctico']==='Portero';const sts=isGK?[['Paradas/90',n2(p['Paradas/90'])],['Efectividad paradas',pct(p['Paradas, %'])],['xG contra/90',n2(p['xG contra/90'])],['Salidas/90',n2(p['Salidas/90'])],['Salidas aéreas/90',n2(p['Salidas aéreas/90'])],['Duelos aéreos%',pct(p['Duelos aéreos ganados, %'])],['Pases/90',n2(p['Pases/90'])],['Prec. pases',pct(p['Precisión pases, %'])],['Pases largos/90',n2(p['Pases largos/90'])],['Prec. pases largos',pct(p['Precisión pases largos, %'])],['Acc. def./90',n2(p['Acciones defensivas/90'])],['Minutos',p['Minutos jugados']||0]]:[['Goles',p['Goles']||0],['xG',n2(p['xG'])],['Asistencias',p['Asistencias']||0],['xA',n2(p['xA'])],['Goles/90',n2(p['Goles/90'])],['Asistencias/90',n2(p['Asistencias/90'])],['Remates/90',n2(p['Remates/90'])],['Pases/90',n2(p['Pases/90'])],['Prec. pases',pct(p['Precisión pases, %'])],['Pases prog./90',n2(p['Pases progresivos/90'])],['Acc. def./90',n2(p['Acciones defensivas/90'])],['Intercep./90',n2(p['Interceptaciones/90'])],['Duelos%',pct(p['Duelos ganados, %'])],['Regates/90',n2(p['Regates/90'])],['Amarillas/90',n2(p['Tarjetas amarillas/90'])],['Minutos',p['Minutos jugados']||0]];document.getElementById('rout').innerHTML=`<div class="card"><div style="background:var(--pr);color:#fff;border-radius:8px;padding:16px 20px;margin-bottom:16px;"><div style="font-size:10px;opacity:.6;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">INFORME · ${p['Liga']||'—'}</div><div style="font-size:22px;font-weight:800;">${p['Jugador']||'—'}</div><div style="font-size:13px;opacity:.8;margin-top:4px;">${p['Equipo']||'—'} · ${p['Posición específica']||'—'} · ${p['Edad']||'—'} años</div></div><div style="display:grid;grid-template-columns:130px 1fr;gap:16px;margin-bottom:16px;align-items:center;"><div style="text-align:center;"><div class="sr" style="width:100px;height:100px;border-color:${col};"><div style="font-size:28px;font-weight:800;color:${col};">${sc.score}</div><div style="font-size:10px;color:var(--mu);">/10</div></div><div style="font-size:10px;color:var(--mu);">CALIFICACIÓN</div></div><div><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:8px;">Desglose</div>${sc.details.map(d=>{const c=scC(d.s);return`<div class="dr"><div class="dn">${d.n}</div><div class="db"><div class="dbf" style="width:${d.s*10}%;background:${c};"></div></div><div class="dv" style="color:${c};">${d.s}/10</div></div>`;}).join('')}<div style="margin-top:8px;font-size:10px;color:var(--mu);font-style:italic;">Calificación de 1 a 10 generada por el algoritmo, basada en la comparación estadística del jugador con el promedio de la liga para su posición.</div></div></div><div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:16px;"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Estadísticas completas</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">${sts.map(([l,v])=>`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:10px;text-align:center;"><div style="font-size:16px;font-weight:700;color:var(--pr);">${v}</div><div style="font-size:10px;color:var(--mu);margin-top:2px;">${l}</div></div>`).join('')}</div></div></div>`;}
+function genRep(){if(!repP)return;const p=repP,sc=calc(p),col=scC(sc.score);const isGK=p['Grupo táctico']==='Portero';const sts=isGK?[['Paradas/90',n2(p['Paradas/90'])],['Efectividad paradas',pct(p['Paradas, %'])],['xG contra/90',n2(p['xG contra/90'])],['Salidas/90',n2(p['Salidas/90'])],['Salidas aéreas/90',n2(p['Salidas aéreas/90'])],['Duelos aéreos%',pct(p['Duelos aéreos ganados, %'])],['Pases/90',n2(p['Pases/90'])],['Prec. pases',pct(p['Precisión pases, %'])],['Pases largos/90',n2(p['Pases largos/90'])],['Prec. pases largos',pct(p['Precisión pases largos, %'])],['Acc. def./90',n2(p[ADR])],['Minutos',p['Minutos jugados']||0]]:[['Goles',p['Goles']||0],['xG',n2(p['xG'])],['Asistencias',p['Asistencias']||0],['xA',n2(p['xA'])],['Goles/90',n2(p['Goles/90'])],['Asistencias/90',n2(p['Asistencias/90'])],['Remates/90',n2(p['Remates/90'])],['Pases/90',n2(p['Pases/90'])],['Prec. pases',pct(p['Precisión pases, %'])],['Pases prog./90',n2(p['Pases progresivos/90'])],['Acc. def./90',n2(p[ADR])],['Intercep./90',n2(p['Interceptaciones/90'])],['Duelos%',pct(p['Duelos ganados, %'])],['Regates/90',n2(p['Regates/90'])],['Amarillas/90',n2(p['Tarjetas amarillas/90'])],['Minutos',p['Minutos jugados']||0]];document.getElementById('rout').innerHTML=`<div class="card"><div style="background:var(--pr);color:#fff;border-radius:8px;padding:16px 20px;margin-bottom:16px;"><div style="font-size:10px;opacity:.6;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">INFORME · ${p['Liga']||'—'}</div><div style="font-size:22px;font-weight:800;">${p['Jugador']||'—'}</div><div style="font-size:13px;opacity:.8;margin-top:4px;">${p['Equipo']||'—'} · ${p['Posición específica']||'—'} · ${p['Edad']||'—'} años</div></div><div style="display:grid;grid-template-columns:130px 1fr;gap:16px;margin-bottom:16px;align-items:center;"><div style="text-align:center;"><div class="sr" style="width:100px;height:100px;border-color:${col};"><div style="font-size:28px;font-weight:800;color:${col};">${sc.score}</div><div style="font-size:10px;color:var(--mu);">/10</div></div><div style="font-size:10px;color:var(--mu);">CALIFICACIÓN</div></div><div><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;margin-bottom:8px;">Desglose</div>${sc.details.map(d=>{const c=scC(d.s);return`<div class="dr"><div class="dn">${d.n}</div><div class="db"><div class="dbf" style="width:${d.s*10}%;background:${c};"></div></div><div class="dv" style="color:${c};">${d.s}/10</div></div>`;}).join('')}<div style="margin-top:8px;font-size:10px;color:var(--mu);font-style:italic;">Calificación de 1 a 10 generada por el algoritmo, basada en la comparación estadística del jugador con el promedio de la liga para su posición.</div></div></div><div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:16px;"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Estadísticas completas</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">${sts.map(([l,v])=>`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:10px;text-align:center;"><div style="font-size:16px;font-weight:700;color:var(--pr);">${v}</div><div style="font-size:10px;color:var(--mu);margin-top:2px;">${l}</div></div>`).join('')}</div></div></div>`;}
 
 // ── COMPARADOR (5 jugadores) ───────────────────────────────────
 let cmpGrp='';
@@ -1290,46 +1289,87 @@ async function cargarDesdeSupabase() {
   const PAGE_SIZE = 1000;
   let offset = 0;
   let totalCargados = 0;
+
+  // Mostrar estado de carga en UI
   const sbci = document.getElementById('sb-ci');
   if(sbci) sbci.textContent = 'Cargando datos...';
+
   try {
     console.log('🔄 Conectando a Supabase...');
+
+    // Paginación: Supabase devuelve máx 1000 filas por defecto
     while(true) {
       const response = await fetch(
         `${SUPABASE_URL}/rest/v1/jugadores?select=*&offset=${offset}&limit=${PAGE_SIZE}`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Range-Unit': 'items', 'Prefer': 'count=exact' } }
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Range-Unit': 'items',
+            'Prefer': 'count=exact'
+          }
+        }
       );
-      if(!response.ok) { const e = await response.text(); throw new Error(`HTTP ${response.status}: ${e}`); }
+
+      if(!response.ok) {
+        const errText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errText}`);
+      }
+
       const jugadores = await response.json();
-      if(!jugadores.length) break;
+      if(!jugadores.length) break; // No hay más datos
+
       for(const j of jugadores) {
-        const datos = (typeof j.datos_completos === 'string') ? JSON.parse(j.datos_completos) : (j.datos_completos || {});
+        // datos_completos es JSONB — ya viene parseado por Supabase REST
+        const datos = (typeof j.datos_completos === 'string')
+          ? JSON.parse(j.datos_completos)
+          : (j.datos_completos || {});
+
         ALL.push({
-          'Jugador': j.nombre_jugador || '—', 'Equipo': j.equipo || '—',
-          'Posición específica': j.posicion || '—', 'Edad': j.edad ?? null,
-          'Partidos jugados': j.partidos ?? 0, 'Minutos jugados': j.minutos ?? 0,
-          'Goles': j.goles ?? 0, 'Asistencias': j.asistencias ?? 0,
-          'xG': j.xg ?? null, 'xA': j.xa ?? null,
-          'Valor de mercado (Transfermarkt)': j.valor_mercado ?? null,
+          // Columnas base de la tabla
+          'Jugador':                          j.nombre_jugador  || '—',
+          'Equipo':                           j.equipo          || '—',
+          'Posición específica':              j.posicion        || '—',
+          'Edad':                             j.edad            ?? null,
+          'Partidos jugados':                 j.partidos        ?? 0,
+          'Minutos jugados':                  j.minutos         ?? 0,
+          'Goles':                            j.goles           ?? 0,
+          'Asistencias':                      j.asistencias     ?? 0,
+          'xG':                               j.xg              ?? null,
+          'xA':                               j.xa              ?? null,
+          'Valor de mercado (Transfermarkt)': j.valor_mercado   ?? null,
+          // Todas las estadísticas adicionales del JSONB (114 columnas)
           ...datos
         });
       }
+
       totalCargados += jugadores.length;
-      console.log(`📦 ${totalCargados} jugadores cargados...`);
+      console.log(`📦 Cargados ${totalCargados} jugadores...`);
+
+      // Si recibimos menos de PAGE_SIZE, terminamos
       if(jugadores.length < PAGE_SIZE) break;
       offset += PAGE_SIZE;
     }
-    console.log(`✅ Total: ${totalCargados} jugadores`);
-    if(sbci) sbci.textContent = 'LigaPro Ecuador';
-    buildCG(); updR();
+
+    console.log(`✅ Total: ${totalCargados} jugadores desde Supabase`);
+
+    // Actualizar UI con info de la competición
+    if(sbci) sbci.textContent = `LigaPro Ecuador`;
+
+    // Inicializar la app con los datos cargados
+    buildCG();
+    updR();
+
   } catch(error) {
-    console.error('❌ Error Supabase:', error);
+    console.error('❌ Error conectando a Supabase:', error);
     if(sbci) sbci.textContent = 'Error de conexión';
+    // Mostrar error no-bloqueante en lugar de alert
     notify('Error Supabase: ' + error.message);
   }
 }
-window.addEventListener('load', cargarDesdeSupabase);
 
+// Cargar datos cuando carga la página
+window.addEventListener('load', cargarDesdeSupabase);
 
 
 // ── PDF EXPORT ─────────────────────────────────────────────────
