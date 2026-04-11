@@ -566,14 +566,25 @@ const COL_MAP = {
 
 // Posición → Grupo táctico
 function posToGrupo(pos){
-  if(!pos) return 'Jugador';
-  const p=pos.trim(), pl=p.toLowerCase();
-  if(pl.includes('portero')||pl.includes('arquero')||p==='GK') return 'Portero';
+  if(!pos||pos==='—') return 'Jugador';
+  // Normalizar: tomar primera posición si hay múltiples separadas por coma
+  const first = pos.split(/[,/]/)[0].trim().toUpperCase();
+  // Inglés abreviado
+  if(['GK','POR'].includes(first)) return 'Portero';
+  if(['CB','RCB','LCB','RCB3','LCB3','CB3','RB','RB5','LB','LB5','RWB','LWB','SW','WB'].some(k=>first===k||first.startsWith(k+' '))) return 'Defensa';
+  if(['DMF','LDMF','RDMF','CDM','DM'].some(k=>first===k||first.startsWith(k+' '))) return 'Mediocampista defensivo';
+  if(['AMF','LAMF','RAMF','CAM','SS','OM'].some(k=>first===k||first.startsWith(k+' '))) return 'Mediocampista ofensivo';
+  if(['CMF','LCMF','RCMF','LCMF3','RCMF3','CM','LCM','RCM','MF'].some(k=>first===k||first.startsWith(k+' '))) return 'Mediocampista defensivo';
+  if(['LW','RW','LWF','RWF','WF','WG'].some(k=>first===k||first.startsWith(k+' '))) return 'Extremo';
+  if(['CF','ST','SS','FW','LCF','RCF'].some(k=>first===k||first.startsWith(k+' '))) return 'Delantero';
+  // Español
+  const pl=pos.toLowerCase();
+  if(pl.includes('portero')||pl.includes('arquero')) return 'Portero';
   if(pl.includes('central')||pl.includes('lateral')||pl.includes('defensa')) return 'Defensa';
-  if(pl.includes('ofensiv')||pl.includes('enganche')||pl.includes('volante ofens')) return 'Mediocampista ofensivo';
+  if(pl.includes('ofensiv')||pl.includes('enganche')) return 'Mediocampista ofensivo';
   if(pl.includes('pivot')||pl.includes('medioc')||pl.includes('volante')) return 'Mediocampista defensivo';
-  if(pl.includes('extremo')||pl.includes('carrilero')||pl.includes('banda')||pl.includes('wing')) return 'Extremo';
-  if(pl.includes('delantero')||pl.includes('ariete')||pl.includes('punta')||pl.includes('centro delantero')) return 'Delantero';
+  if(pl.includes('extremo')||pl.includes('carrilero')||pl.includes('banda')) return 'Extremo';
+  if(pl.includes('delantero')||pl.includes('ariete')||pl.includes('punta')) return 'Delantero';
   return 'Jugador';
 }
 
@@ -809,15 +820,15 @@ function applyF(){
   const eq=document.getElementById('feq')?.value||'';
   const po=document.getElementById('fpo')?.value||'';
   const na=document.getElementById('fna')?.value||'';
-  const am=+document.getElementById('ami')?.value||15;
-  const ax=+document.getElementById('ama')?.value||40;
+  const am=+(document.getElementById('ami')?.value??15);
+  const ax=+(document.getElementById('ama')?.value??40);
   const mm=+document.getElementById('fmm')?.value||0;
   filtP=ALL.filter(p=>{
     const iL=!selL.length||selL.includes(p['Liga']||'');
     const iQ=!q||(p['Jugador']||'').toLowerCase().includes(q)||(p['Equipo']||'').toLowerCase().includes(q);
     const iE=!eq||p['Equipo']===eq;const iP=!po||p['Grupo táctico']===po;
     const iN=!na||p['País de nacimiento']===na;
-    const iA=(p['Edad']||0)>=am&&(p['Edad']||99)<=ax;
+    const age=p['Edad'];const iA=age==null||age===''||(+age>=am&&+age<=ax);
     const iM=(p['Minutos jugados']||0)>=mm;
     return iL&&iQ&&iE&&iP&&iN&&iA&&iM;
   }).sort((a,b)=>(b['Minutos jugados']||0)-(a['Minutos jugados']||0));
