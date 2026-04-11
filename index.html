@@ -527,7 +527,8 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 <div class="ntf" id="ntf"></div>
 
 <script>
-const ALL = []; // Datos se cargarán desde Supabase // [{key, label, value (0-100)}]
+const ALL = []; // Datos se cargarán desde Supabase
+const ADR = 'Acciones defensivas realizadas/90'; // Abreviatura usada en toda la app
 
 function rSrch(){const q=(document.getElementById('rq').value||'').toLowerCase();const team=document.getElementById('rep-team-sel')?.value||'';const r=document.getElementById('rres');const m=ALL.filter(p=>(!team||p['Equipo']===team)&&(!q||(p['Jugador']||'').toLowerCase().includes(q))).slice(0,10);r.style.display=m.length?'block':'none';r.innerHTML=m.map(p=>`<div onclick="selR(${ALL.indexOf(p)})" style="padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--bd);font-size:13px;display:flex;justify-content:space-between;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''"><span><strong>${p['Jugador']}</strong> · <span style="color:var(--mu);font-size:11px;">${p['Equipo']}</span></span><span style="color:var(--mu);font-size:11px;">${p['Posición principal']||'—'}</span></div>`).join('');}
 
@@ -1283,93 +1284,211 @@ function showTop5Panel(slot,li){
 
 
 // ============================================================================
-// FUNCIÓN PARA CARGAR DATOS DESDE SUPABASE
+// MAPA: columna DB → clave display usada en toda la app
+// ============================================================================
+const COL_MAP = {
+  'jugador': 'Jugador',
+  'equipo': 'Equipo',
+  'posicion': 'Posición específica',
+  'edad': 'Edad',
+  'partidos_jugados': 'Partidos jugados',
+  'minutos_jugados': 'Minutos jugados',
+  'goles': 'Goles',
+  'xg': 'xG',
+  'asistencias': 'Asistencias',
+  'xa': 'xA',
+  'duelos_90': 'Duelos/90',
+  'duelos_ganados_pct': 'Duelos ganados, %',
+  'pais_nacimiento': 'País de nacimiento',
+  'pasaporte': 'Pasaporte',
+  'pie': 'Pie',
+  'altura': 'Altura',
+  'peso': 'Peso',
+  'acciones_defensivas_realizadas_90': 'Acciones defensivas realizadas/90',
+  'duelos_defensivos_90': 'Duelos defensivos/90',
+  'duelos_defensivos_ganados_pct': 'Duelos defensivos ganados, %',
+  'duelos_aereos_en_los_90': 'Duelos aéreos en los 90',
+  'duelos_aereos_ganados_pct': 'Duelos aéreos ganados, %',
+  'entradas_90': 'Entradas/90',
+  'posesion_conquistada_despues_de_una_entrada': 'Posesión conquistada después de una entrada',
+  'tiros_interceptados_90': 'Tiros interceptados/90',
+  'interceptaciones_90': 'Interceptaciones/90',
+  'posesion_conquistada_despues_de_una_interceptacion': 'Posesión conquistada después de una interceptación',
+  'faltas_90': 'Faltas/90',
+  'tarjetas_amarillas': 'Tarjetas amarillas',
+  'tarjetas_amarillas_90': 'Tarjetas amarillas/90',
+  'tarjetas_rojas': 'Tarjetas rojas',
+  'tarjetas_rojas_90': 'Tarjetas rojas/90',
+  'acciones_de_ataque_exitosas_90': 'Acciones de ataque exitosas/90',
+  'goles_90': 'Goles/90',
+  'goles_excepto_los_penaltis': 'Goles (excepto los penaltis)',
+  'goles_excepto_los_penaltis_90': 'Goles, excepto los penaltis/90',
+  'xg_90': 'xG/90',
+  'goles_de_cabeza': 'Goles de cabeza',
+  'goles_de_cabeza_90': 'Goles de cabeza/90',
+  'remates': 'Remates',
+  'remates_90': 'Remates/90',
+  'tiros_a_la_porteria_pct': 'Tiros a la portería, %',
+  'goles_hechos_pct': 'Goles hechos, %',
+  'asistencias_90': 'Asistencias/90',
+  'xa_90': 'xA/90',
+  'centros_90': 'Centros/90',
+  'precision_centros_pct': 'Precisión centros, %',
+  'centros_desde_la_banda_izquierda_90': 'Centros desde la banda izquierda/90',
+  'precision_centros_desde_la_banda_izquierda_pct': 'Precisión centros desde la banda izquierda, %',
+  'centros_desde_la_banda_derecha_90': 'Centros desde la banda derecha/90',
+  'precision_centros_desde_la_banda_derecha_pct': 'Precisión centros desde la banda derecha, %',
+  'centros_al_area_pequena_90': 'Centros al área pequeña/90',
+  'regates_90': 'Regates/90',
+  'regates_realizados_pct': 'Regates realizados, %',
+  'duelos_atacantes_90': 'Duelos atacantes/90',
+  'duelos_atacantes_ganados_pct': 'Duelos atacantes ganados, %',
+  'toques_en_el_area_de_penalti_90': 'Toques en el área de penalti/90',
+  'carreras_en_progresion_90': 'Carreras en progresión/90',
+  'pases_recibidos_90': 'Pases recibidos /90',
+  'pases_largos_recibidos_90': 'Pases largos recibidos/90',
+  'faltas_recibidas_90': 'Faltas recibidas/90',
+  'pases_90': 'Pases/90',
+  'precision_pases_pct': 'Precisión pases, %',
+  'pases_hacia_adelante_90': 'Pases hacia adelante/90',
+  'precision_pases_hacia_adelante_pct': 'Precisión pases hacia adelante, %',
+  'pases_hacia_atras_90': 'Pases hacia atrás/90',
+  'precision_pases_hacia_atras_pct': 'Precision pases hacia atrás, %',
+  'pases_laterales_90': 'Pases laterales/90',
+  'precision_pases_laterales_pct': 'Precisión pases laterales, %',
+  'pases_cortos_medios_90': 'Pases cortos / medios /90',
+  'precision_pases_cortos_medios_pct': 'Precisión pases cortos / medios, %',
+  'pases_largos_90': 'Pases largos/90',
+  'precision_pases_largos_pct': 'Precisión pases largos, %',
+  'longitud_media_pases_m': 'Longitud media pases, m',
+  'longitud_media_pases_largos_m': 'Longitud media pases largos, m',
+  'asistencias_90_1': 'Second assists/90',
+  'second_assists_90': 'Second assists/90',
+  'third_assists_90': 'Third assists/90',
+  'desmarques_90': 'Desmarques/90',
+  'precision_desmarques_pct': 'Precisión desmarques, %',
+  'jugadas_claves_90': 'Jugadas claves/90',
+  'pases_en_el_ultimo_tercio_90': 'Pases en el último tercio/90',
+  'precision_pases_en_el_ultimo_tercio_pct': 'Precisión pases en el último tercio, %',
+  'pases_al_area_de_penalti_90': 'Pases al área de penalti/90',
+  'pases_hacia_el_area_pequena_pct': 'Pases hacía el área pequeña, %',
+  'pases_en_profundidad_90': 'Pases en profundidad/90',
+  'precision_pases_en_profundidad_pct': 'Precisión pases en profundidad, %',
+  'ataque_en_profundidad_90': 'Ataque en profundidad/90',
+  'centros_desde_el_ultimo_tercio_90': 'Centros desde el último tercio/90',
+  'pases_progresivos_90': 'Pases progresivos/90',
+  'precision_pases_progresivos_pct': 'Precisión pases progresivos, %',
+  'goles_recibidos': 'Goles recibidos',
+  'goles_recibidos_90': 'Goles recibidos/90',
+  'remates_en_contra': 'Remates en contra',
+  'remates_en_contra_90': 'Remates en contra/90',
+  'porterias_imbatidas_en_los_90': 'Porterías imbatidas en los 90',
+  'paradas_pct': 'Paradas, %',
+  'xg_en_contra': 'xG en contra',
+  'xg_en_contra_90': 'xG en contra/90',
+  'goles_evitados': 'Goles evitados',
+  'goles_evitados_90': 'Goles evitados/90',
+  'pases_hacia_atras_recibidos_del_arquero_90': 'Pases hacía atrás recibidos del arquero/90',
+  'salidas_90': 'Salidas/90',
+  'duelos_aereos_en_los_90_1': 'Duelos aéreos en los 90',
+  'tiros_libres_90': 'Tiros libres/90',
+  'tiros_libres_directos_90': 'Tiros libres directos/90',
+  'tiros_libres_directos_pct': 'Tiros libres directos, %',
+  'corneres_90': 'Córneres/90',
+  'penaltis_a_favor': 'Penaltis a favor',
+  'penaltis_realizados_pct': 'Penaltis realizados, %',
+};
+
+// Mapa posición → Grupo táctico
+const POS_TO_GRUPO = {
+  'Portero':'Portero','GK':'Portero',
+  'Central':'Defensa','Lateral derecho':'Defensa','Lateral izquierdo':'Defensa','Líbero':'Defensa','Defensa':'Defensa',
+  'Mediocampista defensivo':'Mediocampista defensivo','Pivote':'Mediocampista defensivo','MC':'Mediocampista defensivo',
+  'Mediocampista ofensivo':'Mediocampista ofensivo','Enganche':'Mediocampista ofensivo','MCO':'Mediocampista ofensivo',
+  'Extremo derecho':'Extremo','Extremo izquierdo':'Extremo','Extremo':'Extremo','Carrilero':'Extremo',
+  'Delantero centro':'Delantero','Delantero':'Delantero','Centro delantero':'Delantero','Ariete':'Delantero',
+};
+
+function posToGrupo(pos) {
+  if(!pos) return 'Jugador';
+  const p = pos.trim();
+  if(POS_TO_GRUPO[p]) return POS_TO_GRUPO[p];
+  const pl = p.toLowerCase();
+  if(pl.includes('portero')||pl.includes('arquero')||pl.includes('goalkeeper')) return 'Portero';
+  if(pl.includes('central')||pl.includes('defensa')||pl.includes('lateral')) return 'Defensa';
+  if(pl.includes('pivot')||pl.includes('medioc')||pl.includes('volante')) {
+    if(pl.includes('ofensiv')||pl.includes('enganche')) return 'Mediocampista ofensivo';
+    return 'Mediocampista defensivo';
+  }
+  if(pl.includes('extremo')||pl.includes('carrilero')||pl.includes('banda')) return 'Extremo';
+  if(pl.includes('delantero')||pl.includes('ariete')||pl.includes('punta')) return 'Delantero';
+  return 'Jugador';
+}
+
+// ============================================================================
+// CARGAR DATOS DESDE SUPABASE (esquema plano — una columna por métrica)
 // ============================================================================
 async function cargarDesdeSupabase() {
   const PAGE_SIZE = 1000;
   let offset = 0;
   let totalCargados = 0;
-
-  // Mostrar estado de carga en UI
   const sbci = document.getElementById('sb-ci');
   if(sbci) sbci.textContent = 'Cargando datos...';
 
   try {
-    console.log('🔄 Conectando a Supabase...');
-
-    // Paginación: Supabase devuelve máx 1000 filas por defecto
     while(true) {
       const response = await fetch(
         `${SUPABASE_URL}/rest/v1/jugadores?select=*&offset=${offset}&limit=${PAGE_SIZE}`,
-        {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Range-Unit': 'items',
-            'Prefer': 'count=exact'
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+      if(!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+
+      const rows = await response.json();
+      if(!rows.length) break;
+
+      for(const j of rows) {
+        const obj = {};
+        // Mapear cada columna DB a su clave display
+        for(const [dbCol, displayKey] of Object.entries(COL_MAP)) {
+          if(j[dbCol] !== undefined && j[dbCol] !== null) {
+            obj[displayKey] = j[dbCol];
           }
         }
-      );
-
-      if(!response.ok) {
-        const errText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errText}`);
+        // Liga
+        obj['Liga'] = j.liga === 'Serie_A' ? 'LigaPro Serie A' : 'LigaPro Serie B';
+        // Grupo táctico derivado de posición
+        obj['Grupo táctico'] = posToGrupo(j.posicion || '');
+        // Posición principal = posición específica
+        obj['Posición principal'] = j.posicion || '—';
+        ALL.push(obj);
       }
 
-      const jugadores = await response.json();
-      if(!jugadores.length) break; // No hay más datos
-
-      for(const j of jugadores) {
-        // datos_completos es JSONB — ya viene parseado por Supabase REST
-        const datos = (typeof j.datos_completos === 'string')
-          ? JSON.parse(j.datos_completos)
-          : (j.datos_completos || {});
-
-        ALL.push({
-          // Columnas base de la tabla
-          'Jugador':                          j.nombre_jugador  || '—',
-          'Equipo':                           j.equipo          || '—',
-          'Posición específica':              j.posicion        || '—',
-          'Edad':                             j.edad            ?? null,
-          'Partidos jugados':                 j.partidos        ?? 0,
-          'Minutos jugados':                  j.minutos         ?? 0,
-          'Goles':                            j.goles           ?? 0,
-          'Asistencias':                      j.asistencias     ?? 0,
-          'xG':                               j.xg              ?? null,
-          'xA':                               j.xa              ?? null,
-          'Valor de mercado (Transfermarkt)': j.valor_mercado   ?? null,
-          // Todas las estadísticas adicionales del JSONB (114 columnas)
-          ...datos
-        });
-      }
-
-      totalCargados += jugadores.length;
-      console.log(`📦 Cargados ${totalCargados} jugadores...`);
-
-      // Si recibimos menos de PAGE_SIZE, terminamos
-      if(jugadores.length < PAGE_SIZE) break;
+      totalCargados += rows.length;
+      if(rows.length < PAGE_SIZE) break;
       offset += PAGE_SIZE;
     }
 
-    console.log(`✅ Total: ${totalCargados} jugadores desde Supabase`);
-
-    // Actualizar UI con info de la competición
-    if(sbci) sbci.textContent = `LigaPro Ecuador`;
-
-    // Inicializar la app con los datos cargados
+    if(sbci) sbci.textContent = 'LigaPro Ecuador';
+    console.log(`✅ ${totalCargados} jugadores cargados`);
     buildCG();
     updR();
 
   } catch(error) {
-    console.error('❌ Error conectando a Supabase:', error);
+    console.error('❌ Supabase error:', error);
     if(sbci) sbci.textContent = 'Error de conexión';
-    // Mostrar error no-bloqueante en lugar de alert
     notify('Error Supabase: ' + error.message);
   }
 }
 
 // Cargar datos cuando carga la página
-window.addEventListener('load', cargarDesdeSupabase);
+window.addEventListener('load', () => {
+  if(location.protocol === 'file:') {
+    document.getElementById('sb-ci').textContent = 'Error: abrir desde servidor';
+    notify('⚠️ Abrí el archivo desde un servidor (GitHub Pages, VS Code Live Server, etc.) — file:// bloquea las peticiones a Supabase.');
+    return;
+  }
+  cargarDesdeSupabase();
+});
 
 
 // ── PDF EXPORT ─────────────────────────────────────────────────
