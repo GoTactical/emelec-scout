@@ -160,7 +160,7 @@ tr:hover td{background:var(--bg);cursor:pointer;}
   <div class="sbl">
     <div class="lt">⚽ <span>Emelec</span> Scout</div>
     <div class="ls">Sistema de Scouting</div>
-    <div class="lb">Demo · 500 jugadores</div>
+    <div class="lb">Beta</div>
   </div>
   <nav class="nav">
     <div class="ns">Explorar</div>
@@ -178,7 +178,7 @@ tr:hover td{background:var(--bg);cursor:pointer;}
   <div class="tb">
     <div class="tbt" id="tt">Dashboard</div>
     <div style="display:flex;gap:10px;align-items:center;">
-      <div class="sbg"><strong id="tbj">500</strong> jugadores</div>
+      <div class="sbg"><strong id="tbj">—</strong> jugadores</div>
       <div class="sbg" id="tbc">Sin filtro</div>
       <button class="btn bts" style="font-size:12px;padding:5px 12px;" onclick="openComp()">🏆 Competición</button>
     </div>
@@ -489,8 +489,6 @@ const ALL = []; // Datos cargados desde Supabase
 // ── CONFIGURACIÓN SUPABASE ────────────────────────────────────
 const SUPABASE_URL = 'https://qvgzgzyiogbpiukklguv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2Z3pnenlpb2dicGl1a2tsZ3V2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwOTA4NzAsImV4cCI6MjA4ODY2Njg3MH0.DXJP1VAR961iR8ewkM_u4WYTw3n8QqL_EvFVeZvPqK4';
-const ADR = 'Acciones defensivas realizadas/90';
-
 // Mapa columna DB → clave display
 const COL_MAP = {
   'jugador':'Jugador','equipo':'Equipo','posicion':'Posición específica',
@@ -831,7 +829,7 @@ function resetF(){document.getElementById('fsr').value='';document.getElementByI
 
 // ── KPIs + TOPS ───────────────────────────────────────────────
 const ADR='Acciones defensivas realizadas/90';
-function updKPIs(){const d=filtP;document.getElementById('kt').textContent=d.length;document.getElementById('ks').textContent=selL.join(' + ');document.getElementById('keq').textContent=new Set(d.map(p=>p['Equipo'])).size;document.getElementById('rc').textContent=d.length;}
+function updKPIs(){const d=filtP;document.getElementById('kt').textContent=d.length;document.getElementById('ks').textContent=selL.join(' + ');document.getElementById('keq').textContent=new Set(d.map(p=>p['Equipo'])).size;document.getElementById('rc').textContent=d.length;document.getElementById('tbj').textContent=d.length;}
 function renderTops(){const d=filtP;fTop('tgo',[...d].sort((a,b)=>(b['Goles/90']||0)-(a['Goles/90']||0)).slice(0,8),p=>`<td></td><td class="fw7">${p['Jugador']}</td><td>${p['Equipo']}</td><td>${ltag(p['Liga'])}</td><td class="fw7">${n2(p['Goles/90'])}</td>`);fTop('tas',[...d].sort((a,b)=>(b['Asistencias/90']||0)-(a['Asistencias/90']||0)).slice(0,8),p=>`<td></td><td class="fw7">${p['Jugador']}</td><td>${p['Equipo']}</td><td>${ltag(p['Liga'])}</td><td class="fw7">${n2(p['Asistencias/90'])}</td>`);fTop('tdf',[...d].sort((a,b)=>(b[ADR]||0)-(a[ADR]||0)).slice(0,8),p=>`<td></td><td class="fw7">${p['Jugador']}</td><td>${p['Equipo']}</td><td>${ltag(p['Liga'])}</td><td class="fw7">${n2(p[ADR])}</td>`);fTop('trg',[...d].sort((a,b)=>(b['Regates/90']||0)-(a['Regates/90']||0)).slice(0,8),p=>`<td></td><td class="fw7">${p['Jugador']}</td><td>${p['Equipo']}</td><td>${ltag(p['Liga'])}</td><td class="fw7">${n2(p['Regates/90'])}</td><td>${pct(p['Regates realizados, %'])}</td>`);}
 function fTop(id,data,rf){document.querySelector(`#${id} tbody`).innerHTML=data.map(p=>`<tr onclick="openM(${ALL.indexOf(p)})">${rf(p)}</tr>`).join('');}
 
